@@ -101,7 +101,13 @@ function setWalk(k,dir,frame){const el=document.querySelector(`#hp-${k} .spr`);i
 function renderDock(){const r=ROUNDS[G.round];$('dock').innerHTML=Object.entries(HELPERS).map(([k,h])=>{const hp=R.helpers[k],cid=helperChar(k),nm=k==='me'?M.characters[cid].name+'(나)':h.name;const st=!r.helpers?'졸업했어요':hp.task?hp.task.label:'대기 중 · 끌어서 보내기';return `<button class="hcard ${!r.helpers?'off':hp.task?'busy':''}" aria-pressed="${sel===k}" data-hcard="${k}" aria-label="${nm}, ${h.skill}, ${st}">${portrait(cid,hp.task?'explaining':'neutral')}<span><b>${nm}</b><small>${h.skill} · ${h.tag}</small><span class="st">${st}</span></span></button>`}).join('')+`<button class="ee-button bc" id="bcBtn" ${R.bcLeft<1||R.t<R.alertT||!r?'disabled':''}>${art('icons',GIC.bc,'gs-art" style="width:34px;height:30px')}마을방송<small>${R.bcLeft}회 · 회관 근처만</small></button>`;
  document.querySelectorAll('[data-hcard]').forEach(bindHelperDrag);$('bcBtn').onclick=broadcast}
 function hudIcons(){$('safePill').innerHTML=`${icon('person',18)}<span id="safeTxt">대피 0/0</span>`;$('helpBtn').innerHTML=icon('help',24);setSoundBtn()}
-function setSoundBtn(){$('soundBtn').innerHTML=icon(soundOn?'volume':'music',24);$('soundBtn').setAttribute('aria-pressed',soundOn);$('soundBtn').setAttribute('aria-label',soundOn?'효과음 끄기':'효과음 켜기')}
+function setSoundBtn(){$('soundBtn').innerHTML=icon(soundOn?'volume':'music',24);$('soundBtn').setAttribute('aria-pressed',soundOn);$('soundBtn').setAttribute('aria-label',soundOn?'소리 끄기':'소리 켜기(배경음악·효과음)')}
+/* 배경음악: 평소엔 잔잔한 곡, 비가 오는 라운드 중엔 긴장감 있는 곡. ♪ 버튼으로 효과음과 함께 켜고 끔 */
+const BGM={calm:'assets/bgm-calm.mp3',rain:'assets/bgm-rain.mp3'};let actx=null,bgmBuf={},bgmNow=null,bgmNode=null;
+function bgmInit(){if(actx)return;try{actx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return}Object.entries(BGM).forEach(([k,u])=>fetch(u).then(r=>r.arrayBuffer()).then(b=>actx.decodeAudioData(b)).then(d=>{bgmBuf[k]=d}).catch(()=>{}))}
+function bgmTick(){if(!actx)return;if(actx.state==='suspended'&&soundOn)actx.resume().catch(()=>{});const want=!soundOn||document.hidden?null:(!paused&&R&&R.T&&R.t<R.T)?'rain':'calm';if(want===bgmNow||(want&&!bgmBuf[want]))return;const t=actx.currentTime;
+ if(bgmNode){const o=bgmNode;o.g.gain.setTargetAtTime(0,t,.35);setTimeout(()=>{try{o.s.stop()}catch(e){}},1600)}bgmNode=null;bgmNow=want;if(!want)return;
+ const s=actx.createBufferSource(),g=actx.createGain();s.buffer=bgmBuf[want];s.loop=true;g.gain.value=0;g.gain.setTargetAtTime(want==='rain'?.3:.24,t,.5);s.connect(g).connect(actx.destination);s.start();bgmNode={s,g}}
 
 /* ---------- 라운드 ---------- */
 function startRound(){const r=ROUNDS[G.round];R={...r,t:0,houses:houseList(r),helpers:{},bcLeft:r.bc,alertT:G.owned.includes('fast')?1:5,events:[],goodsSaved:0,dots:[],evacuated:0};
@@ -295,8 +301,8 @@ async function boot(){$('card').innerHTML='<p class="loading">윤리시티 자�
  if(!M||!window.EthicityAssets){$('card').innerHTML='<p class="loading">공통 팩(ethicity-elementary-common-v1)을 찾지 못했어요.<br>solidarity 폴더 옆에 shared 폴더가 있는지 확인해 주세요.</p>';return}
  try{assets=await EthicityAssets.load(M,COMMON_BASE)}catch(e){$('card').innerHTML=`<p class="loading">공통 자산을 불러오지 못했어요.<br><small>${esc(e.message)}</small></p>`;return}
  try{soundOn=localStorage.getItem(SOUND_KEY)==='1'}catch(e){}assets.setSound(soundOn);
- hudIcons();$('soundBtn').onclick=()=>{soundOn=!soundOn;assets.setSound(soundOn);try{localStorage.setItem(SOUND_KEY,soundOn?'1':'0')}catch(e){}setSoundBtn();sfx('tap')};$('helpBtn').onclick=help;if(DEMO)demoBar();document.addEventListener('visibilitychange',()=>{if(document.hidden&&!paused&&$('overlay').hidden)help()});
+ hudIcons();bgmInit();setInterval(bgmTick,300);['pointerdown','keydown'].forEach(e=>document.addEventListener(e,()=>{if(actx&&actx.state==='suspended')actx.resume().catch(()=>{})},{passive:true}));$('soundBtn').onclick=()=>{soundOn=!soundOn;assets.setSound(soundOn);try{localStorage.setItem(SOUND_KEY,soundOn?'1':'0')}catch(e){}setSoundBtn();sfx('tap')};$('helpBtn').onclick=help;if(DEMO)demoBar();document.addEventListener('visibilitychange',()=>{if(document.hidden&&!paused&&$('overlay').hidden)help()});
  bindMap();startScreen();post({type:'ethicity:ready'})}
-window.__f={get G(){return G},get R(){return R},get paused(){return paused}};
+window.__f={get bgm(){return bgmNow},get G(){return G},get R(){return R},get paused(){return paused}};
 boot();
 })();
