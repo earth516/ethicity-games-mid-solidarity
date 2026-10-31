@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 const GAME_ID='solidarity';
-const COMMON_BASE='../shared/ethicity-elementary-common-v1';
+const COMMON_BASE='shared/ethicity-elementary-common-v1';
 const STORE_KEY='ethicity.solidarity.save', SOUND_KEY='ethicity.solidarity.sound';
 const M=window.ETHICITY_COMMON_MANIFEST;
 const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
