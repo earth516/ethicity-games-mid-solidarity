@@ -134,3 +134,11 @@ body.game-solidarity{background:var(--ee-paper);overscroll-behavior:none;-webkit
 /* 교사 시연 모드 */
 .game-solidarity .gs-demo{font-size:20px;line-height:1;color:var(--ee-ink)}
 .game-solidarity .gs-demo[aria-pressed=true]{background:#f3cf72}
+
+/* 라운드 시작 카운트다운 */
+.game-solidarity .gs-count{position:fixed;inset:0;z-index:180;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#1d2f2a55;pointer-events:none}
+.game-solidarity .gs-count b{font-size:clamp(96px,22vw,180px);line-height:1;color:#fff9e7;-webkit-text-stroke:6px #294b40;paint-order:stroke fill;text-shadow:0 6px 0 #294b40;animation:gs-pop .8s ease-out}
+.game-solidarity .gs-count b.go{font-size:clamp(64px,14vw,120px);color:#f3cf72}
+.game-solidarity .gs-count small{font-size:20px;font-weight:700;color:#fff9e7;background:#294b40;padding:4px 14px;border-radius:4px}
+@keyframes gs-pop{0%{transform:scale(1.6);opacity:0}30%{transform:scale(1);opacity:1}100%{transform:scale(.92);opacity:.9}}
+@media(prefers-reduced-motion:reduce){.game-solidarity .gs-count b{animation:none}}

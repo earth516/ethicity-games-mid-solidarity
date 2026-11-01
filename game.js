@@ -29,6 +29,7 @@ const SHEET={residents:'assets/residents.png',buildings:'assets/buildings.png',i
 const RES={elder:0,vn:1,np:2,deaf:3,phone:4,mine:5,chief:6,merchant:7},BLD={house:0,old:1,mine:2,hall:3,shelter:4,center:5},GIC={multi:0,light:1,chief:2,fast:3,sand:4,buddy:5,bc:6,goods:7,buoy:8};
 function artSvg(sheet,i,x,y,w,h,cls=''){const b=BOX[sheet][i];return `<svg class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${b.join(' ')}" preserveAspectRatio="xMidYMax meet"><image href="${SHEET[sheet]}" width="${SZ[sheet][0]}" height="${SZ[sheet][1]}"/></svg>`}
 function art(sheet,i,cls='gs-art'){const b=BOX[sheet][i];return `<svg class="${cls}" viewBox="${b.join(' ')}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><image href="${SHEET[sheet]}" width="${SZ[sheet][0]}" height="${SZ[sheet][1]}"/></svg>`}
+function tagOf(h){return h.lang||(h.t==='deaf'?'수어':h.t==='elder'?'어르신':'')}
 function resOf(h){return h.t==='foreign'?(h.lang==='NP'?RES.np:RES.vn):RES[h.t]}
 function bldOf(h){return h.t==='mine'?BLD.mine:h.t==='elder'?BLD.old:BLD.house}
 function toast(t,ms=2400){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>$('toast').hidden=true,ms)}
@@ -90,11 +91,11 @@ function drawHouses(){$('houses').innerHTML=R.houses.map(h=>`<g class="house" id
  <rect class="base" x="-46" y="-50" width="92" height="80" fill="transparent"/>
  ${artSvg('buildings',bldOf(h),-46,-58,92,82,'bimg')}
  ${artSvg('residents',resOf(h),24,-34,34,58,'rimg')}
- ${h.lang?`<text x="58" y="-30" font-size="13" font-weight="700" fill="#294b40" stroke="#fff9e7" stroke-width="3" paint-order="stroke">${h.lang}</text>`:''}
+ ${tagOf(h)?`<text x="58" y="-30" font-size="13" font-weight="700" fill="#294b40" stroke="#fff9e7" stroke-width="3" paint-order="stroke">${tagOf(h)}</text>`:''}
  <g class="status" transform="translate(0,34)"></g>
  ${h.t==='mine'?`<g class="goods">${artSvg('icons',GIC.goods,-64,-20,30,30)}</g>`:''}
  </g>`).join('')}
-function setStatus(h,txt,color='#294b40',buoy=false){const g=document.querySelector(`#g-${h.id} .status`);if(!txt){g.innerHTML='';return}const fill={'#5a8c65':'#2f6b45','#bf7865':'#b23f2c','#9a7417':'#8a6512'}[color]||color,w=Math.round([...txt].length*13+22+(buoy?20:0)),x0=-w/2;g.innerHTML=`<g filter="url(#tagSh)"><rect x="${x0}" y="-12" width="${w}" height="24" rx="12" fill="${fill}" stroke="#fffdf6" stroke-width="2"/></g>`+(buoy?artSvg('icons',GIC.buoy,x0+4,-10,20,20):'')+`<text x="${buoy?10:0}" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">${txt}</text>`}
+function setStatus(h,txt,color='#294b40',buoy=false){const g=document.querySelector(`#g-${h.id} .status`);if(!txt){g.innerHTML='';return}const fill={'#5a8c65':'#2f6b45','#bf7865':'#b23f2c','#9a7417':'#8a6512','#6b7075':'#5b6066'}[color]||color,w=Math.round([...txt].length*13+22+(buoy?20:0)),x0=-w/2;g.innerHTML=`<g filter="url(#tagSh)"><rect x="${x0}" y="-12" width="${w}" height="24" rx="12" fill="${fill}" stroke="#fffdf6" stroke-width="2"/></g>`+(buoy?artSvg('icons',GIC.buoy,x0+4,-10,20,20):'')+`<text x="${buoy?10:0}" y="5" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">${txt}</text>`}
 function floatTxt(x,y,txt,color='#5a8c65'){const g=document.createElementNS(NS,'text');g.setAttribute('x',x);g.setAttribute('y',y);g.setAttribute('text-anchor','middle');g.setAttribute('font-size','18');g.setAttribute('font-weight','700');g.setAttribute('fill',color);g.setAttribute('stroke','#fff9e7');g.setAttribute('stroke-width','4');g.setAttribute('paint-order','stroke');g.classList.add('float');g.textContent=txt;$('fx').appendChild(g);setTimeout(()=>g.remove(),1300)}
 function drawHelpers(){$('helpersG').innerHTML=Object.entries(R.helpers).map(([k,hp])=>`<g class="helper" id="hp-${k}" data-helper="${k}" transform="translate(${hp.x},${hp.y})"><ellipse cx="0" cy="0" rx="18" ry="5" fill="#294b4033"/><g class="body">${walkSvg(helperChar(k),0,0,.62,'down',1)}</g><text y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#294b40" stroke="#fff9e7" stroke-width="4" paint-order="stroke">${k==='me'?M.characters[helperChar(k)].name+'(나)':HELPERS[k].name}</text><g class="hstat" transform="translate(0,-86)"></g></g>`).join('')}
 function setWalk(k,dir,frame){const el=document.querySelector(`#hp-${k} .spr`);if(!el)return;const c=M.characters[helperChar(k)],row=c.directions.indexOf(dir);el.setAttribute('viewBox',`${frame*96} ${row*128} 96 128`)}
@@ -117,7 +118,9 @@ function startRound(){const r=ROUNDS[G.round];R={...r,t:0,houses:houseList(r),he
  $('roundChip').textContent=`${r.n}라운드 · ${r.title}`;$('rainPill').textContent=`시간당 ${r.rain}mm`;$('goodsPill').hidden=false;updateGoods();
  if(G.owned.includes('sand')){const mine=R.houses.find(h=>h.t==='mine');if(mine)mine.sand=true}
  if(r.road&&r.helpers)R.events.push({at:r.road,fn:roadFlood});
- sfx('door');paused=false;last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)}
+ countdown(()=>{sfx('door');paused=false;last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);toast(G.round===0?'강물이 차오르기 시작했어요! 강에 가까운 윗줄 집부터 물이 닿아요.':'강물이 차오르기 시작했어요!',3000)})}
+function countdown(done){const el=document.createElement('div');el.className='gs-count';el.setAttribute('role','status');document.body.appendChild(el);const seq=['3','2','1','시작!'];let i=0;
+ const step=()=>{if(i>=seq.length){el.remove();done();return}const last=i===seq.length-1;el.innerHTML=`<b class="${last?'go':''}">${seq[i]}</b><small>${last?'물이 차오르기 시작해요':`곧 비가 쏟아져요 · ${R.alertT}초 뒤 AI 경보`}</small>`;sfx(last?'collect':'tap');i++;setTimeout(step,last?650:800)};step()}
 function updateGoods(){$('goodsPill').innerHTML=`${art('icons',GIC.goods,'gs-art" style="width:20px;height:18px')}<span>짐 ${G.goods}</span>`}
 const REMOTE=['방송','이장'];
 function warn(h,via){if(h.warned!=null||h.flooded)return;h.warned=R.t;h.via=via;document.getElementById('g-'+h.id).classList.add('lit');
@@ -127,8 +130,8 @@ function warn(h,via){if(h.warned!=null||h.flooded)return;h.warned=R.t;h.via=via;
 function visit(h,by){if(h.flooded||h.safe)return;if(h.hesitate){h.hesitate=false;h.leaveAt=R.t+1;h.via=by;setStatus(h,'함께 출발','#5a8c65')}else warn(h,by)}
 function systemAlerts(){for(const h of R.houses){if(h.t==='phone'||h.t==='mine')warn(h,'AI');if(h.t==='foreign'&&G.owned.includes('multi'))warn(h,'다국어');if(h.t==='deaf'&&G.owned.includes('light'))warn(h,'불빛')}
  if(G.owned.includes('chief'))R.events.push({at:R.t+3,fn:()=>R.houses.filter(h=>h.t==='elder').forEach(h=>{if(h.warned==null&&!h.flooded){warn(h,'이장');floatTxt(h.x,h.y-70,'전화')}})});
- for(const h of R.houses)if(h.warned!=null)floatTxt(h.x,h.y-70,'경보!');sfx('collect');
- const left=R.houses.filter(h=>h.warned==null);toast(`AI 경보 발송! 받지 못한 집 ${left.length}곳`,2600);renderDock()}
+ for(const h of R.houses)if(h.warned!=null)floatTxt(h.x,h.y-70,'경보!');sfx('collect');for(const h of R.houses)if(h.warned==null&&h.t!=='mine')setStatus(h,'경보 못 받음','#6b7075');
+ const left=R.houses.filter(h=>h.warned==null);toast(`AI 경보 발송! 받지 못한 집 ${left.length}곳 · 회색 '경보 못 받음' 집으로 봉사단을 보내요`,3600);renderDock()}
 function broadcast(){if(paused||R.bcLeft<1||R.t<R.alertT)return;R.bcLeft--;logIt('마을방송');sfx('tap');effect('clue',HALL.x,HALL.y-70,64);const ring=document.createElementNS(NS,'circle');ring.setAttribute('cx',HALL.x);ring.setAttribute('cy',HALL.y);ring.setAttribute('r',10);ring.setAttribute('fill','none');ring.setAttribute('stroke','#f3cf72');ring.setAttribute('stroke-width','6');$('fx').appendChild(ring);let rr=10;const iv=setInterval(()=>{rr+=reduced?HALL.r:12;ring.setAttribute('r',rr);ring.setAttribute('opacity',Math.max(0,1-rr/HALL.r));if(rr>=HALL.r){clearInterval(iv);ring.remove()}},16);
  for(const h of R.houses){if(Math.hypot(h.x-HALL.x,h.y-HALL.y)>HALL.r||h.warned!=null)continue;if(h.t==='deaf'){floatTxt(h.x,h.y-70,'못 들음','#bf7865');continue}if(h.t==='foreign'&&!G.owned.includes('multi')){floatTxt(h.x,h.y-70,'무슨 말?','#bf7865');continue}warn(h,'방송');floatTxt(h.x,h.y-70,'방송')}renderDock()}
 function sendHelper(k,houseId){const hp=R.helpers[k],h=R.houses.find(x=>x.id===houseId);if(!h||hp.task||!ROUNDS[G.round].helpers)return;
