@@ -25,14 +25,14 @@ function effect(id,x,y,size=56){const e=M.effects.effects[id];if(!e)return;const
 let soundOn=false,lastMiss=0;function sfx(id){if(!assets||!soundOn)return;if(id==='miss'){const n=Date.now();if(n-lastMiss<1500)return;lastMiss=n}assets.playSound(id)}
 
 /* ---------- 게임 전용 자산 (assets/) ---------- */
-const BOX={"residents":[[8,8,119,300],[143,8,93,300],[252,8,98,300],[366,8,113,300],[495,8,96,300],[607,8,173,300],[796,8,101,300],[913,8,113,300]],"buildings":[[12,12,300,217],[336,12,300,215],[660,12,300,231],[12,291,300,218],[336,291,300,229],[660,291,300,255]],"icons":[[12,12,198,200],[236,12,168,200],[460,12,200,126],[12,236,123,200],[236,236,200,137],[460,236,200,165],[12,460,200,170],[236,460,200,186],[460,460,200,123]],"helpers":[[8,8,119,360],[143,8,124,360],[283,8,116,360],[415,8,114,360]]};
-const SZ={"residents":[1034,316],"buildings":[972,558],"icons":[672,672],"helpers":[537,376]}; // 시트 크기(건물·아이콘은 Higgsfield 실사 그림)
+const BOX={"residents":[[8,8,156,300],[180,8,131,300],[327,8,131,300],[474,8,135,300],[625,8,139,300],[780,8,246,300],[1042,8,144,300],[1202,8,165,300]],"buildings":[[8,8,301,260],[325,8,305,260],[646,8,291,260],[953,8,294,260],[1263,8,305,260],[1584,8,244,260]],"icons":[[12,12,198,200],[236,12,168,200],[460,12,200,126],[12,236,123,200],[236,236,200,137],[460,236,200,165],[12,460,200,170],[236,460,200,186],[460,460,200,123]],"helpers":[[8,8,165,360],[189,8,156,360],[361,8,171,360],[548,8,178,360]]};
+const SZ={"residents":[1375,316],"buildings":[1836,276],"icons":[672,672],"helpers":[734,376]}; // 시트 크기(건물·아이콘은 Higgsfield 실사 그림)
 const SHEET={helpers:'assets/helpers.png',residents:'assets/residents.png',buildings:'assets/buildings.png',icons:'assets/game-icons.png'};
 const RES={elder:0,vn:1,np:2,deaf:3,phone:4,mine:5,chief:6,merchant:7},BLD={house:0,old:1,mine:2,hall:3,shelter:4,center:5},GIC={multi:0,light:1,chief:2,fast:3,sand:4,buddy:5,bc:6,goods:7,buoy:8};
 function artSvg(sheet,i,x,y,w,h,cls=''){const b=BOX[sheet][i];return `<svg class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${b.join(' ')}" preserveAspectRatio="xMidYMax meet"><image href="${SHEET[sheet]}" width="${SZ[sheet][0]}" height="${SZ[sheet][1]}"/></svg>`}
 function art(sheet,i,cls='gs-art'){const b=BOX[sheet][i];return `<svg class="${cls}" viewBox="${b.join(' ')}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><image href="${SHEET[sheet]}" width="${SZ[sheet][0]}" height="${SZ[sheet][1]}"/></svg>`}
 function pill(x,y,txt,fs=12,anchor='middle',bg='#1f2b26',op=.74){const w=Math.round([...String(txt)].length*fs*.95+fs*.9),x0=anchor==='middle'?x-w/2:x;return `<g class="pill"><rect x="${x0}" y="${y-fs*.85}" width="${w}" height="${fs*1.55}" rx="${fs*.78}" fill="${bg}" opacity="${op}"/><text x="${x0+w/2}" y="${y+fs*.32}" text-anchor="middle" font-size="${fs}" fill="#fff">${txt}</text></g>`}
-function tagOf(h){return (h.lang?(h.lang==='VN'?'베트남인':'네팔인'):'')||(h.t==='deaf'?'수어':h.t==='elder'?'어르신':'')}
+function tagOf(h){return (h.lang?(h.lang==='VN'?'베트남인':'네팔인'):'')||(h.t==='deaf'?'수어 필요':h.t==='elder'?'어르신':'')}
 function resOf(h){return h.t==='foreign'?(h.lang==='NP'?RES.np:RES.vn):RES[h.t]}
 function bldOf(h){return h.t==='mine'?BLD.mine:h.t==='elder'?BLD.old:BLD.house}
 function toast(t,ms=2400){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>$('toast').hidden=true,ms)}
@@ -93,8 +93,8 @@ function drawHouses(){$('houses').innerHTML=R.houses.map(h=>`<g class="house" id
  <ellipse class="glow" cx="0" cy="14" rx="66" ry="30" fill="url(#litG)" opacity="0"/><circle class="danger-ring" r="50" fill="none" stroke="#bf7865" stroke-width="5" stroke-dasharray="10 6"/>
  <rect class="base" x="-46" y="-50" width="92" height="80" fill="transparent"/>
  ${artSvg('buildings',bldOf(h),-46,-58,92,82,'bimg')}
- ${`<g class="rimg" filter="url(#ppl)"><ellipse cx="40" cy="23" rx="11" ry="3.2" fill="#000" opacity=".35"/>${artSvg('residents',resOf(h),26,-30,28,53)}</g>`}
- ${tagOf(h)?pill(58,-36,tagOf(h),11,'start'):''}
+ ${`<g class="rimg" filter="url(#ppl)"><ellipse cx="40" cy="23" rx="11" ry="3.2" fill="#000" opacity=".35"/>${artSvg('residents',resOf(h),24,-32,34,55)}</g>`}
+ ${tagOf(h)?pill(41,-41,tagOf(h),11):''}
  <g class="status" transform="translate(0,33)"></g>
  ${h.t==='mine'?`<g class="goods">${artSvg('icons',GIC.goods,-64,-20,30,30)}</g>`:''}
  </g>`).join('')}
