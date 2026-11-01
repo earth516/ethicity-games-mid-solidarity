@@ -149,3 +149,5 @@ body.game-solidarity{background:var(--ee-paper);overscroll-behavior:none;-webkit
 /* 실감판: 지도 글자는 깔끔한 고딕, 굵게 쓰지 않음 */
 .game-solidarity svg#map text{font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;font-weight:500;letter-spacing:-.01em}
 .game-solidarity svg#map text.float{stroke-width:3px;font-size:16px}
+
+.game-solidarity .ee-button.bc small{white-space:nowrap;font-size:12px}
