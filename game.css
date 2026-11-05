@@ -151,3 +151,19 @@ body.game-solidarity{background:var(--ee-paper);overscroll-behavior:none;-webkit
 .game-solidarity svg#map text.float{stroke-width:3px;font-size:16px}
 
 .game-solidarity .ee-button.bc small{white-space:nowrap;font-size:12px}
+
+/* 튜토리얼 안내 */
+.game-solidarity .gs-coach{position:fixed;left:50%;bottom:128px;transform:translateX(-50%);z-index:170;display:flex;gap:12px;align-items:flex-start;width:min(720px,94vw);background:#fff9e7;border:3px solid #294b40;border-radius:8px;padding:10px 14px;box-shadow:0 8px 24px #0005}
+.game-solidarity .gs-coach .gs-portrait{width:56px;height:56px}
+.game-solidarity .gs-coach p{margin:0 0 8px;font-size:16px;line-height:1.5}
+.game-solidarity .gs-coach .row{display:flex;gap:8px;justify-content:flex-end;margin:0}
+.game-solidarity .ee-button.sm{font-size:14px;padding:6px 12px;min-height:0}
+.game-solidarity .tut-hl{outline:4px solid #f3cf72;outline-offset:3px;animation:gs-tut 1s ease-in-out infinite alternate}
+.game-solidarity .house.tut-hl{outline:none}.game-solidarity .house.tut-hl .ring{opacity:1;stroke:#f3b52a;stroke-width:6}
+@keyframes gs-tut{to{outline-color:#f3cf7255}}
+.game-solidarity .gs-hand{position:fixed;z-index:175;transform:translate(-30%,-30%);transition:left 1.2s ease-in-out,top 1.2s ease-in-out;pointer-events:none;filter:drop-shadow(0 6px 10px #0006)}
+.game-solidarity .gs-hand span{position:absolute;right:-16px;bottom:-18px;font-size:34px}
+/* 결과 지도 보기 */
+.game-solidarity .gs-peek{position:fixed;left:50%;top:55%;transform:translate(-50%,-50%);z-index:150;background:#fff9e7f2;border:3px solid #294b40;border-radius:8px;padding:12px 16px;box-shadow:0 10px 30px #0006;text-align:center;width:min(520px,92vw)}
+.game-solidarity .gs-peek p{margin:0 0 10px;font-size:16px}
+.game-solidarity .gs-peek .row{justify-content:center}

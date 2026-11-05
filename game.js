@@ -25,13 +25,15 @@ function effect(id,x,y,size=56){const e=M.effects.effects[id];if(!e)return;const
 let soundOn=false,lastMiss=0;function sfx(id){if(!assets||!soundOn)return;if(id==='miss'){const n=Date.now();if(n-lastMiss<1500)return;lastMiss=n}assets.playSound(id)}
 
 /* ---------- 게임 전용 자산 (assets/) ---------- */
-const BOX={"residents":[[8,8,156,300],[180,8,131,300],[327,8,131,300],[474,8,135,300],[625,8,139,300],[780,8,246,300],[1042,8,144,300],[1202,8,165,300]],"buildings":[[8,8,301,260],[325,8,305,260],[646,8,291,260],[953,8,294,260],[1263,8,305,260],[1584,8,244,260]],"icons":[[12,12,198,200],[236,12,168,200],[460,12,200,126],[12,236,123,200],[236,236,200,137],[460,236,200,165],[12,460,200,170],[236,460,200,186],[460,460,200,123]],"helpers":[[8,8,165,360],[189,8,156,360],[361,8,171,360],[548,8,178,360]]};
-const SZ={"residents":[1375,316],"buildings":[1836,276],"icons":[672,672],"helpers":[734,376]}; // 시트 크기(건물·아이콘은 Higgsfield 실사 그림)
+const BOX={"residents":[[8,8,156,300],[180,8,131,300],[327,8,131,300],[474,8,135,300],[625,8,139,300],[780,8,246,300],[1042,8,144,300],[1202,8,165,300]],"buildings":[[8,8,301,260],[325,8,305,260],[646,8,291,260],[953,8,294,260],[1263,8,305,260],[1584,8,244,260],[1844,8,279,260]],"icons":[[12,12,198,200],[236,12,168,200],[460,12,200,126],[12,236,123,200],[236,236,200,137],[460,236,200,165],[12,460,200,170],[236,460,200,186],[460,460,200,123]],"helpers":[[8,8,165,360],[189,8,156,360],[361,8,171,360],[548,8,178,360]]};
+const SZ={"residents":[1375,316],"buildings":[2131,276],"icons":[672,672],"helpers":[734,376]}; // 시트 크기(건물·아이콘은 Higgsfield 실사 그림)
 const SHEET={helpers:'assets/helpers.png',residents:'assets/residents.png',buildings:'assets/buildings.png',icons:'assets/game-icons.png'};
-const RES={elder:0,vn:1,np:2,deaf:3,phone:4,mine:5,chief:6,merchant:7},BLD={house:0,old:1,mine:2,hall:3,shelter:4,center:5},GIC={multi:0,light:1,chief:2,fast:3,sand:4,buddy:5,bc:6,goods:7,buoy:8};
+const RES={elder:0,vn:1,np:2,deaf:3,phone:4,mine:5,chief:6,merchant:7},BLD={house:0,old:1,mine:2,hall:3,shelter:4,center:5},GIC={multi:0,light:1,chief:2,fast:3,sand:4,buddy:5,bc:6,goods:7,buoy:8,hall:6};
 function artSvg(sheet,i,x,y,w,h,cls=''){const b=BOX[sheet][i];return `<svg class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${b.join(' ')}" preserveAspectRatio="xMidYMax meet"><svg x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}" viewBox="${b.join(' ')}"><image href="${SHEET[sheet]}" width="${SZ[sheet][0]}" height="${SZ[sheet][1]}"/></svg></svg>`}
 function art(sheet,i,cls='gs-art'){const b=BOX[sheet][i];return `<svg class="${cls}" viewBox="${b.join(' ')}" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><svg x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}" viewBox="${b.join(' ')}"><image href="${SHEET[sheet]}" width="${SZ[sheet][0]}" height="${SZ[sheet][1]}"/></svg></svg>`}
 function pill(x,y,txt,fs=12,anchor='middle',bg='#1f2b26',op=.74){const w=Math.round([...String(txt)].length*fs*.95+fs*.9),x0=anchor==='middle'?x-w/2:anchor==='end'?x-w:x;return `<g class="pill"><rect x="${x0}" y="${y-fs*.85}" width="${w}" height="${fs*1.55}" rx="${fs*.78}" fill="${bg}" opacity="${op}"/><text x="${x0+w/2}" y="${y+fs*.32}" text-anchor="middle" font-size="${fs}" fill="#fff">${txt}</text></g>`}
+const HCOL={saebom:'#2463b5',daon:'#d36b12'};
+function tagCol(h){return h.t==='deaf'?HCOL.saebom:h.lang==='VN'?HCOL.daon:'#1f2b26'}
 function tagOf(h){return (h.lang?(h.lang==='VN'?'베트남인':'네팔인'):'')||(h.t==='deaf'?'수어 필요':h.t==='elder'?'어르신':'')}
 function resOf(h){return h.t==='foreign'?(h.lang==='NP'?RES.np:RES.vn):RES[h.t]}
 function bldOf(h){return h.t==='mine'?BLD.mine:h.t==='elder'?BLD.old:BLD.house}
@@ -44,7 +46,7 @@ const BASE_HOUSES=[
  {id:'h1',x:170,y:165,t:'phone'},{id:'h2',x:300,y:135,t:'elder'},{id:'h3',x:430,y:175,t:'phone'},{id:'h4',x:565,y:145,t:'foreign',lang:'VN'},{id:'h5',x:700,y:170,t:'deaf'},{id:'h6',x:835,y:150,t:'phone'},
  {id:'h7',x:215,y:300,t:'elder'},{id:'h8',x:370,y:305,t:'mine'},{id:'h9',x:525,y:290,t:'phone'},{id:'h10',x:665,y:315,t:'foreign',lang:'VN'},{id:'h11',x:815,y:290,t:'elder'},{id:'h12',x:290,y:440,t:'phone'}];
 const EXTRA_HOUSES=[{id:'h13',x:110,y:250,t:'elder'},{id:'h14',x:745,y:235,t:'foreign',lang:'NP'}];
-const BASE={x:520,y:520},SHELTER={x:905,y:520},HALL={x:110,y:450,r:240};
+const BASE={x:520,y:520},SHELTER={x:905,y:520},HALL={x:110,y:450,get r(){return G&&G.owned&&G.owned.includes('hall')?360:240}};
 const HELPERS={me:{id:'jiho',name:'나',skill:'우리 집 열쇠',tag:'짐 옮기기 가능'},saebom:{id:'saebom',name:'새봄',skill:'수어 가능',tag:'청각장애인 집 빠름'},daon:{id:'daon',name:'다온',skill:'베트남어 가능',tag:'베트남어 집 빠름'}};
 const ROUNDS=[
  {n:1,title:'첫 폭우',rain:80,T:58,maxY:360,houses:'base',helpers:true,bc:1,intro:'AI 홍수 경보 시스템이 처음 가동됐어요. 그런데 경보는 스마트폰이 있고 한국어를 쓰는 주민에게만 가요.'},
@@ -56,6 +58,7 @@ const UPGRADES=[
  {id:'chief',name:'이장 전화 연락망',desc:'어르신 집에 3초 뒤 전화 경보',cost:1},
  {id:'fast',name:'AI 예측 고도화',desc:'경보가 4초 빨라짐 (이미 받는 사람만)',cost:2},
  {id:'sand',name:'우리 집 모래주머니',desc:'우리 집 짐은 자동으로 지켜짐',cost:1},
+ {id:'hall',name:'마을회관 방송 확장',desc:'방송이 더 멀리, 라운드마다 2번 (못 듣는 사람은 그대로)',cost:1},
  {id:'buddy',name:'이웃 짝꿍 제도',desc:'어르신마다 이웃 짝꿍이 직접 알림 (회의 2부터)',cost:1,late:true}];
 const VOICES1=[[RES.elder,'전화로 한 번만 알려 주면 바로 나가지.'],[RES.vn,'한국어 문자는 무슨 말인지 몰라요.'],[RES.deaf,'소리는 못 들어요. 불빛이면 돼요.'],[RES.merchant,'상인회: AI를 더 좋게 하면 모두 빨라지잖아요!']];
 const VOICES2=[[RES.elder,'전화가 와도 혼자 나가기 무서워.'],[RES.np,'네팔어 쓰는 친구도 이사 왔어요.'],['saebom','봉사단: 우리 내년엔 졸업이야. 우리 없이도 될까?']];
@@ -80,7 +83,7 @@ function drawMap(){const m=$('map');m.innerHTML=`
  <image href="assets/map-toy.jpg" x="-5" y="-107" width="1290" height="826" preserveAspectRatio="none"/>
  
  <g id="world" transform="translate(40,0) scale(1.2)">
- <g id="hall"><circle cx="${HALL.x}" cy="${HALL.y}" r="${HALL.r}" fill="#f3cf7214" stroke="#f3cf7288" stroke-dasharray="8 8"/>${artSvg('buildings',BLD.hall,HALL.x-46,HALL.y-62,92,88)}${pill(HALL.x,HALL.y+42,'마을회관',12)}</g>
+ <g id="hall"><circle cx="${HALL.x}" cy="${HALL.y}" r="${HALL.r}" fill="#f3cf7214" stroke="#f3cf7288" stroke-dasharray="8 8"/>${G&&G.owned.includes('hall')?artSvg('buildings',6,HALL.x-60,HALL.y-84,120,108):artSvg('buildings',BLD.hall,HALL.x-46,HALL.y-62,92,88)}${pill(HALL.x,HALL.y+42,'마을회관',12)}</g>
  <g>${artSvg('buildings',BLD.shelter,SHELTER.x-62,SHELTER.y-78,124,104)}${pill(SHELTER.x,SHELTER.y+40,'대피소',12)}<text id="shelterCount" x="${SHELTER.x}" y="${SHELTER.y-50}" text-anchor="middle" font-size="16" font-weight="700" fill="#294b40" stroke="#fff9e7" stroke-width="4" paint-order="stroke"></text></g>
  <g>${artSvg('buildings',BLD.center,BASE.x-120,BASE.y-70,70,72)}${pill(BASE.x-85,BASE.y+16,'청소년센터',12)}</g>
  <rect id="flood" x="-34" y="0" width="1068" height="78" fill="#8a7b62" opacity=".72"/>
@@ -95,15 +98,15 @@ function drawHouses(){$('houses').innerHTML=R.houses.map(h=>`<g class="house" id
  <rect class="base" x="-46" y="-50" width="92" height="80" fill="transparent"/>
  ${artSvg('buildings',bldOf(h),-46,-58,92,82,'bimg')}
  ${`<g class="rimg" ><ellipse cx="40" cy="23" rx="11" ry="3.2" fill="#000" opacity=".35"/>${artSvg('residents',resOf(h),24,-32,34,55)}</g>`}
- ${tagOf(h)?pill(41,-41,tagOf(h),11):''}
+ ${tagOf(h)?pill(41,-41,tagOf(h),11,'middle',tagCol(h),h.t==='deaf'||h.lang==='VN'?.95:.74):''}
  <g class="status" transform="translate(0,33)"></g>
  ${h.t==='mine'?`<g class="goods">${artSvg('icons',GIC.goods,-64,-20,30,30)}</g>`:''}
  </g>`).join('')}
 function setStatus(h,txt,color='#294b40',buoy=false){const g=document.querySelector(`#g-${h.id} .status`);if(!txt){g.innerHTML='';return}const fill={'#5a8c65':'#2f6b45','#bf7865':'#b23f2c','#9a7417':'#8a6512','#6b7075':'#4a4f54'}[color]||color,fs=12,w=Math.round([...txt].length*fs*.95+fs*1.1+(buoy?16:0)),x0=-w/2;g.innerHTML=`<rect x="${x0}" y="-10" width="${w}" height="19" rx="9.5" fill="${fill}" opacity=".9"/>`+(buoy?artSvg('icons',GIC.buoy,x0+3,-8,15,15):'')+`<text x="${buoy?8:0}" y="4" text-anchor="middle" font-size="${fs}" fill="#fff">${txt}</text>`}
 function floatTxt(x,y,txt,color='#5a8c65'){const g=document.createElementNS(NS,'text');g.setAttribute('x',x);g.setAttribute('y',y);g.setAttribute('text-anchor','middle');g.setAttribute('font-size','18');g.setAttribute('font-weight','700');g.setAttribute('fill',color);g.setAttribute('stroke','#fff9e7');g.setAttribute('stroke-width','4');g.setAttribute('paint-order','stroke');g.classList.add('float');g.textContent=txt;$('fx').appendChild(g);setTimeout(()=>g.remove(),1300)}
-function drawHelpers(){$('helpersG').innerHTML=Object.entries(R.helpers).map(([k,hp])=>`<g class="helper" id="hp-${k}" data-helper="${k}" transform="translate(${hp.x},${hp.y})"><ellipse cx="0" cy="0" rx="11" ry="3.4" fill="#000" opacity=".35"/><g class="body" >${walkSvg(helperChar(k),0,0,.62,'down',1)}</g>${pill(0,14,k==='me'?M.characters[helperChar(k)].name+'(나)':HELPERS[k].name,11,'middle','#294b40',.82)}<g class="hstat" transform="translate(0,-86)"></g></g>`).join('')}
+function drawHelpers(){if(G&&!ROUNDS[G.round].helpers){$('helpersG').innerHTML='';return}$('helpersG').innerHTML=Object.entries(R.helpers).map(([k,hp])=>`<g class="helper" id="hp-${k}" data-helper="${k}" transform="translate(${hp.x},${hp.y})"><ellipse cx="0" cy="0" rx="11" ry="3.4" fill="#000" opacity=".35"/><g class="body" >${walkSvg(helperChar(k),0,0,.62,'down',1)}</g>${pill(0,14,k==='me'?M.characters[helperChar(k)].name+'(나)':HELPERS[k].name,11,'middle',HCOL[k]||'#294b40',.9)}<g class="hstat" transform="translate(0,-86)"></g></g>`).join('')}
 function setWalk(k,dir,frame){const el=document.querySelector(`#hp-${k} .spr`);if(!el)return;if(el.dataset.real){const r=realFlip(el.dataset.real,dir,frame,+el.dataset.f);el.dataset.f=r.f;el.firstElementChild.setAttribute('transform',r.t);return}const c=M.characters[helperChar(k)],row=c.directions.indexOf(dir);el.setAttribute('viewBox',`${frame*96} ${row*128} 96 128`)}
-function renderDock(){const r=ROUNDS[G.round];$('dock').innerHTML=Object.entries(HELPERS).map(([k,h])=>{const hp=R.helpers[k],cid=helperChar(k),nm=k==='me'?M.characters[cid].name+'(나)':h.name;const st=!r.helpers?'졸업했어요':hp.task?hp.task.label:'대기 중 · 끌어서 보내기';return `<button class="hcard ${!r.helpers?'off':hp.task?'busy':''}" aria-pressed="${sel===k}" data-hcard="${k}" aria-label="${nm}, ${h.skill}, ${st}">${portrait(cid,hp.task?'explaining':'neutral')}<span><b>${nm}</b><small>${h.skill} · ${h.tag}</small><span class="st">${st}</span></span></button>`}).join('')+`<button class="ee-button bc" id="bcBtn" ${R.bcLeft<1||R.t<R.alertT||!r?'disabled':''}>${art('icons',GIC.bc,'gs-art" style="width:34px;height:30px')}마을방송<small>${R.bcLeft}회 · 회관 근처</small></button>`;
+function renderDock(){const r=ROUNDS[G.round];$('dock').innerHTML=Object.entries(HELPERS).map(([k,h])=>{const hp=R.helpers[k],cid=helperChar(k),nm=k==='me'?M.characters[cid].name+'(나)':h.name;const st=!r.helpers?'졸업했어요':hp.task?hp.task.label:'대기 중 · 끌어서 보내기';return `<button class="hcard ${!r.helpers?'off':hp.task?'busy':''}"${HCOL[k]?` style="border-color:${HCOL[k]}"`:''} aria-pressed="${sel===k}" data-hcard="${k}" aria-label="${nm}, ${h.skill}, ${st}">${portrait(cid,hp.task?'explaining':'neutral')}<span><b>${nm}</b><small${HCOL[k]?` style="color:${HCOL[k]};font-weight:700"`:''}>${h.skill} · ${h.tag}</small><span class="st">${st}</span></span></button>`}).join('')+`<button class="ee-button bc" id="bcBtn" ${R.bcLeft<1||R.t<R.alertT||!r?'disabled':''}>${art('icons',GIC.bc,'gs-art" style="width:34px;height:30px')}마을방송<small>${R.bcLeft}회 · 회관 근처</small></button>`;
  document.querySelectorAll('[data-hcard]').forEach(bindHelperDrag);$('bcBtn').onclick=broadcast}
 function hudIcons(){$('safePill').innerHTML=`${icon('person',18)}<span id="safeTxt">대피 0/0</span>`;$('helpBtn').innerHTML=icon('help',24);setSoundBtn()}
 function setSoundBtn(){$('soundBtn').innerHTML=icon(soundOn?'volume':'music',24);$('soundBtn').setAttribute('aria-pressed',soundOn);$('soundBtn').setAttribute('aria-label',soundOn?'소리 끄기':'소리 켜기(배경음악·효과음)')}
@@ -115,7 +118,7 @@ function bgmTick(){if(!actx)return;if(actx.state==='suspended'&&soundOn)actx.res
  const s=actx.createBufferSource(),g=actx.createGain();s.buffer=bgmBuf[want];s.loop=true;g.gain.value=0;g.gain.setTargetAtTime(want==='rain'?.3:.24,t,.5);s.connect(g).connect(actx.destination);s.start();bgmNode={s,g}}
 
 /* ---------- 라운드 ---------- */
-function startRound(){const r=ROUNDS[G.round];R={...r,t:0,houses:houseList(r),helpers:{},bcLeft:r.bc,alertT:G.owned.includes('fast')?1:5,events:[],goodsSaved:0,dots:[],evacuated:0,rescueT:r.T-8,rescued:false,rsec:-1};
+function startRound(){const r=ROUNDS[G.round];R={...r,t:0,houses:houseList(r),helpers:{},bcLeft:r.bc+(G.owned.includes('hall')?1:0),alertT:G.owned.includes('fast')?1:5,events:[],goodsSaved:0,dots:[],evacuated:0,rescueT:r.T-8,rescued:false,rsec:-1};
  for(const h of R.houses){h.warned=null;h.flooded=false;h.safe=false;h.ft=floodTime(h.y)}
  Object.keys(HELPERS).forEach((k,i)=>R.helpers[k]={x:BASE.x-50+i*50,y:BASE.y-20,task:null,dir:'down'});
  drawMap();drawHouses();drawHelpers();renderDock();updateHud();
@@ -128,14 +131,14 @@ function countdown(done){const el=document.createElement('div');el.className='gs
 function updateGoods(){$('goodsPill').innerHTML=`${art('icons',GIC.goods,'gs-art" style="width:20px;height:18px')}<span>짐 ${G.goods}</span>`}
 const REMOTE=['방송','이장'];
 function warn(h,via){if(h.warned!=null||h.flooded)return;h.warned=R.t;h.via=via;document.getElementById('g-'+h.id).classList.add('lit');
- if(G.round>=1&&h.t==='elder'&&REMOTE.includes(via)){h.hesitate=true;setStatus(h,'망설임…','#bf7865');floatTxt(h.x,h.y-96,'혼자는 무서워','#bf7865');if(!R.hesToast){R.hesToast=true;logIt('돌발: 망설이는 어르신');setTimeout(()=>{if(!paused)toast('돌발 상황! 어르신이 혼자 나가기 무서워 망설여요. 누군가 직접 가야 해요.',3600)},400)}}
+ if(G.round>=1&&h.t==='elder'&&REMOTE.includes(via)){h.hesitate=true;setStatus(h,'망설임…','#bf7865');floatTxt(h.x,h.y-96,'혼자는 무서워','#bf7865');if(!R.hesToast){R.hesToast=true;logIt('돌발: 망설이는 어르신');setTimeout(()=>{if(!paused)toast(ROUNDS[G.round].helpers?'돌발 상황! 어르신이 혼자 나가기 무서워 망설여요. 누군가 직접 가야 해요.':'어르신이 혼자 나가기 무서워 망설여요. 이번엔 직접 갈 봉사단이 없어요…',3600)},400)}}
  else{setStatus(h,'준비 중','#9a7417');h.leaveAt=R.t+TYPES[h.t].prep}
  if(G.owned.includes('buddy')&&h.t==='phone'){const e=R.houses.filter(o=>o.t==='elder'&&!o.buddy&&(o.warned==null||o.hesitate)&&Math.hypot(o.x-h.x,o.y-h.y)<220).sort((a,b)=>Math.hypot(a.x-h.x,a.y-h.y)-Math.hypot(b.x-h.x,b.y-h.y))[0];if(e){e.buddy=true;R.events.push({at:R.t+2,fn:()=>{visit(e,'짝꿍');floatTxt(e.x,e.y-70,'짝꿍')}})}}}
 function visit(h,by){if(h.flooded||h.safe)return;if(h.hesitate){h.hesitate=false;h.leaveAt=R.t+1;h.via=by;setStatus(h,'함께 출발','#5a8c65')}else warn(h,by)}
 function systemAlerts(){for(const h of R.houses){if(h.t==='phone'||h.t==='mine')warn(h,'AI');if(h.t==='foreign'&&G.owned.includes('multi'))warn(h,'다국어');if(h.t==='deaf'&&G.owned.includes('light'))warn(h,'불빛')}
  if(G.owned.includes('chief'))R.events.push({at:R.t+3,fn:()=>R.houses.filter(h=>h.t==='elder').forEach(h=>{if(h.warned==null&&!h.flooded){warn(h,'이장');floatTxt(h.x,h.y-70,'전화')}})});
  for(const h of R.houses)if(h.warned!=null)floatTxt(h.x,h.y-70,'경보!');sfx('collect');for(const h of R.houses)if(h.warned==null&&h.t!=='mine')setStatus(h,'경보 못 받음','#6b7075');
- const left=R.houses.filter(h=>h.warned==null);toast(`AI 경보 발송! 받지 못한 집 ${left.length}곳 · 회색 '경보 못 받음' 집으로 봉사단을 보내요`,3600);renderDock()}
+ const left=R.houses.filter(h=>h.warned==null);toast(ROUNDS[G.round].helpers?`AI 경보 발송! 받지 못한 집 ${left.length}곳 · 회색 '경보 못 받음' 집으로 봉사단을 보내요`:`AI 경보 발송! 받지 못한 집 ${left.length}곳 · 봉사단 없이 시스템만으로 닿을까요? 지켜봐요`,3600);renderDock()}
 function broadcast(){if(paused||R.bcLeft<1||R.t<R.alertT)return;R.bcLeft--;logIt('마을방송');sfx('tap');effect('clue',HALL.x,HALL.y-70,64);const ring=document.createElementNS(NS,'circle');ring.setAttribute('cx',HALL.x);ring.setAttribute('cy',HALL.y);ring.setAttribute('r',10);ring.setAttribute('fill','none');ring.setAttribute('stroke','#f3cf72');ring.setAttribute('stroke-width','6');$('fx').appendChild(ring);let rr=10;const iv=setInterval(()=>{rr+=reduced?HALL.r:12;ring.setAttribute('r',rr);ring.setAttribute('opacity',Math.max(0,1-rr/HALL.r));if(rr>=HALL.r){clearInterval(iv);ring.remove()}},16);
  for(const h of R.houses){if(Math.hypot(h.x-HALL.x,h.y-HALL.y)>HALL.r||h.warned!=null)continue;if(h.t==='deaf'){floatTxt(h.x,h.y-70,'못 들음','#bf7865');continue}if(h.t==='foreign'&&!G.owned.includes('multi')){floatTxt(h.x,h.y-70,'무슨 말?','#bf7865');continue}warn(h,'방송');floatTxt(h.x,h.y-70,'방송')}renderDock()}
 function sendHelper(k,houseId){const hp=R.helpers[k],h=R.houses.find(x=>x.id===houseId);if(!h||hp.task||!ROUNDS[G.round].helpers)return;
@@ -175,24 +178,43 @@ function stepHelpers(){for(const [k,hp] of Object.entries(R.helpers)){const tk=h
   if(tk.house.flooded&&tk.mode==='warn'){hp.task=null;el.querySelector('.hstat').innerHTML='';effect('retry',tk.house.x,tk.house.y-30);toast('물이 먼저 들어왔어요…');setWalk(k,'down',1);renderDock();continue}
   if(p>=1){el.querySelector('.hstat').innerHTML='';const h=tk.house;if(tk.mode==='goods'){h.goodsDone=true;G.goods++;R.goodsSaved++;updateGoods();floatTxt(h.x,h.y-70,'짐 지킴!','#9a7417');document.querySelector(`#g-${h.id} .goods`)?.remove();sfx('paper')}else{const was=h.hesitate;visit(h,HELPERS[k].name);effect('correct',h.x,h.y-40);floatTxt(h.x,h.y-80,was?'같이 가요!':tk.work<=1?'통했다!':'전달!');sfx('collect')}hp.task=null;setWalk(k,'down',1);renderDock()}}
  el.setAttribute('transform',`translate(${hp.x},${hp.y})`)}}
-function stepHouses(){const wy=waterY(R.t);$('flood').setAttribute('height',wy);$('floodEdge').setAttribute('y',wy-6);
- for(const h of R.houses){const dz=!h.safe&&!h.flooded&&h.t!=='mine'&&(h.leaveAt==null||h.leaveAt>h.ft)&&h.ft-R.t<10&&h.ft-R.t>0;if(dz!==!!h.dz){h.dz=dz;document.getElementById('g-'+h.id).classList.toggle('danger',dz);if(dz&&!G.dangerTip){G.dangerTip=true;toast('빨간 점선이 깜빡이는 집은 곧 물이 닿아요! 서둘러요.',3000)}}
+function stepHouses(){const wy=waterY(fc());$('flood').setAttribute('height',wy);$('floodEdge').setAttribute('y',wy-6);
+ for(const h of R.houses){const dz=!h.safe&&!h.flooded&&h.t!=='mine'&&(h.leaveAt==null||h.leaveAt-(R.hold||0)>h.ft)&&h.ft-fc()<10&&h.ft-fc()>0;if(dz!==!!h.dz){h.dz=dz;document.getElementById('g-'+h.id).classList.toggle('danger',dz);if(dz&&!G.dangerTip){G.dangerTip=true;toast(ROUNDS[G.round].helpers?'빨간 점선이 깜빡이는 집은 곧 물이 닿아요! 서둘러요.':'빨간 점선이 깜빡이는 집은 곧 물이 닿아요.',3000)}}
   if(h.safe||h.flooded)continue;if(h.leaveAt!=null&&R.t>=h.leaveAt){h.safe=true;setStatus(h,'대피 ✓','#5a8c65');document.getElementById('g-'+h.id).classList.add('left');R.dots.push({x:h.x+40,y:h.y,r:routeTo(h.x+40,h.y,SHELTER.x,SHELTER.y),t0:R.t,dur:Math.hypot(SHELTER.x-h.x,SHELTER.y-h.y)/(h.t==='elder'?110:170),res:resOf(h)});continue}
   if(wy>=h.y-12){h.flooded=true;h.dz=false;document.getElementById('g-'+h.id).classList.remove('danger');setStatus(h,'구조 대기','#bf7865',true);document.getElementById('g-'+h.id).classList.add('flooded');sfx('miss');if(h.t==='mine'&&!h.goodsDone&&!h.sand)floatTxt(h.x,h.y-70,'짐 잠김','#bf7865')}}
  if(R.t>=R.alertT&&!R.alerted){R.alerted=true;systemAlerts()}
- if(R.t>=R.rescueT&&!R.rescued)rescueArrive();
+ if(fc()>=R.rescueT&&!R.rescued)rescueArrive();
+ if(R.alerted&&G.round===0&&!G.tutDone&&!R.tut&&!R.tutStarted){R.tutStarted=true;startTutorial()}
  $('dots').innerHTML=R.dots.map(d=>{const p=Math.min(1,(R.t-d.t0)/d.dur);if(p>=1){if(!d.arr){d.arr=true;R.evacuated++}return ''}const {x,y}=along(d.r,p),bob=reduced?0:Math.abs(Math.sin(R.t*10))*3;return `<g ><ellipse cx="${x}" cy="${y}" rx="9" ry="2.8" fill="#000" opacity=".3"/>${artSvg('residents',d.res,x-12,y-44-bob,24,44)}</g>`}).join('');
  $('shelterCount').textContent=R.evacuated?`${R.evacuated}명 도착`:''}
-function rescueHud(){const g=$('rescue119');if(!g||R.rescueT==null)return;const left=Math.max(0,Math.ceil(R.rescueT-R.t)),key=R.rescued?-2:left;if(key===R.rsec)return;R.rsec=key;
+function rescueHud(){const g=$('rescue119');if(!g||R.rescueT==null)return;const left=Math.max(0,Math.ceil(R.rescueT-fc())),key=R.rescued?-2:left;if(key===R.rsec)return;R.rsec=key;
  g.innerHTML=R.t<R.alertT?'':pill(1262,700,R.rescued?'🚒 119 구조대 도착 · 구조 대기 주민 구조 중':`🚒 119 구조대 · 읍내 12km${R.slow?' · 길 잠김':''} · 도착까지 ${left}초`,14,'end',R.rescued?'#2b5f8a':'#7a2d22',.9)}
 function rescueArrive(){if(R.rescued)return;R.rescued=true;const fl=R.houses.filter(h=>h.flooded&&h.t!=='mine');fl.forEach(h=>setStatus(h,'119 구조','#2b5f8a',true));logIt('119 구조대 도착');toast(fl.length?`🚒 119 구조대 도착! 구조 대기 주민 ${fl.length}명을 보트로 구해요. 그동안 물속에서 기다렸어요.`:'🚒 119 구조대 도착! 다행히 기다리는 주민이 없어요.',3600);rescueHud()}
-function updateHud(){rescueHud();const p=Math.max(0,1-R.t/R.T);$('timerBar').style.width=(p*100)+'%';$('timerWrap').setAttribute('aria-valuenow',Math.round(p*100));$('timerWrap').classList.toggle('low',p<.25);const total=R.houses.filter(h=>h.t!=='mine').length,safe=R.houses.filter(h=>h.t!=='mine'&&h.safe).length;const s=$('safeTxt');if(s)s.textContent=`대피 ${safe}/${total}`}
-function loop(now){if(paused)return;const dt=Math.max(0,Math.min(.1,(now-last)/1000));last=now;R.t+=dt*SPEED;
+
+/* ---------- 1라운드 튜토리얼: 경보 직후 물이 멈추고, 시범 → 직접 해 보기 ---------- */
+function coach(html,btns=''){let c=$('coach');if(!c){c=document.createElement('div');c.id='coach';c.className='gs-coach';document.body.appendChild(c)}c.innerHTML=`${portrait('robot','explaining')}<div><p>${html}</p><div class="row">${btns}<button class="ee-button secondary sm" id="tutSkip">튜토리얼 건너뛰기</button></div></div>`;$('tutSkip').onclick=tutEnd;const n=$('tutNext');if(n)n.onclick=()=>{R.tut.go=true}}
+function hl(sel,on=true){document.querySelectorAll('.tut-hl').forEach(e=>{if(!on||!sel)e.classList.remove('tut-hl')});if(on&&sel)document.querySelectorAll(sel).forEach(e=>e.classList.add('tut-hl'))}
+function startTutorial(){R.tut={step:0,go:false};R.tutHold=true;sfx('door');
+ coach('<b>잠깐! 물이 멈췄어요.</b> 회색 <b>\'경보 못 받음\'</b> 표시가 붙은 집은 AI 경보를 받지 못한 집이에요. 이 집들은 봉사단이 <b>직접 달려가서</b> 알려 줘야 해요.','<button class="ee-button sm" id="tutNext">다음 ▶</button>');
+ hl('.house:not(.lit)')}
+function demoDrag(k,hid,done){const card=document.querySelector(`[data-hcard="${k}"]`),tg=document.querySelector(`#g-${hid} .base`);if(!card||!tg){done();return}const a=card.getBoundingClientRect(),b=tg.getBoundingClientRect(),g=document.createElement('div');g.className='gs-hand';g.innerHTML=portrait(helperChar(k),'happy').replace('gs-portrait','gs-portrait" style="width:56px;height:56px;')+'<span>👆</span>';document.body.appendChild(g);
+ g.style.left=(a.left+a.width/2)+'px';g.style.top=(a.top+a.height/2)+'px';requestAnimationFrame(()=>requestAnimationFrame(()=>{g.style.left=(b.left+b.width/2)+'px';g.style.top=(b.top+b.height/2)+'px'}));setTimeout(()=>{g.remove();done()},1500)}
+function tutTick(){const T=R.tut;if(!T||G.round!==0)return;
+ if(T.step===0&&T.go){T.step=1;T.go=false;hl(null,false);const h=R.houses.find(x=>x.id==='h4');hl('[data-hcard="daon"], #g-h4');coach('<b>이렇게 해요!</b> 다온이 카드를 <span style="color:#d36b12;font-weight:700">베트남인</span> 집으로 끌어다 놓아 볼게요. 다온이는 베트남어를 할 줄 알아서 <b>1초 만에</b> 전달해요.');
+  if(R.helpers.daon.task||!h||h.warned!=null){T.step=3;return}demoDrag('daon','h4',()=>{sendHelper('daon','h4');T.step=2})}
+ else if(T.step===2){const h=R.houses.find(x=>x.id==='h4');if(h&&h.warned!=null){T.step=3;coach('<b>통했어요!</b> 경보를 받은 주민은 <b>준비 중</b> → <b>대피 ✓</b> 순서로 대피소까지 걸어가요. 물이 집에 닿기 전에 떠나면 대피 성공이에요.','<button class="ee-button sm" id="tutNext">다음 ▶</button>')}}
+ else if(T.step===3&&T.go){T.step=4;T.go=false;const h5=R.houses.find(x=>x.id==='h5');if(!h5||h5.warned!=null||R.helpers.saebom.task){T.step=5;T.go=true;return}hl('[data-hcard="saebom"], #g-h5');coach('<b>이제 직접 해 봐요.</b> <span style="color:#2463b5;font-weight:700">새봄이</span> 카드를 <span style="color:#2463b5;font-weight:700">\'수어 필요\'</span> 집으로 끌어다 놓으세요. (카드를 누르고 집을 눌러도 돼요)')}
+ else if(T.step===4){if(Object.values(R.helpers).some(q=>q.task&&q.task.house&&q.task.house.id!=='h4')){T.step=5;T.go=false;hl(null,false);coach('<b>잘했어요!</b> 남은 회색 집에도 봉사단을 보내요. <b>빨간 점선</b>이 깜빡이는 집은 곧 물이 닿아요. 이제 물이 다시 차오르기 시작해요!','<button class="ee-button sm" id="tutNext">시작 ▶</button>')}}
+ else if(T.step===5&&T.go)tutEnd()}
+function tutEnd(){hl(null,false);$('coach')?.remove();if(R&&R.tut){R.tut=null;R.tutHold=false;toast('물이 다시 차오르기 시작했어요!',2200)}if(G){G.tutDone=true;save()}}
+function fc(){return R.t-(R.hold||0)}
+function updateHud(){rescueHud();const p=Math.max(0,1-fc()/R.T);$('timerBar').style.width=(p*100)+'%';$('timerWrap').setAttribute('aria-valuenow',Math.round(p*100));$('timerWrap').classList.toggle('low',p<.25);const total=R.houses.filter(h=>h.t!=='mine').length,safe=R.houses.filter(h=>h.t!=='mine'&&h.safe).length;const s=$('safeTxt');if(s)s.textContent=`대피 ${safe}/${total}`}
+function loop(now){if(paused)return;const dt=Math.max(0,Math.min(.1,(now-last)/1000));last=now;R.t+=dt*SPEED;if(R.tutHold)R.hold=(R.hold||0)+dt*SPEED;
  R.events=R.events.filter(e=>{if(R.t>=e.at){e.fn();return false}return true});
- stepHelpers();stepHouses();updateHud();
+ stepHelpers();stepHouses();updateHud();tutTick();
  if(R.t>=R.alertT&&$('bcBtn').disabled&&R.bcLeft>0)renderDock();
  const pending=R.houses.some(h=>!h.safe&&!h.flooded&&h.ft<R.T),busy=Object.values(R.helpers).some(h=>h.task);
- if(R.t>=R.T||(!pending&&!busy&&R.t>R.alertT+1&&R.houses.every(h=>h.safe||h.flooded||h.y>R.maxY))){finishRound();return}
+ if(fc()>=R.T||(!R.tut&&!pending&&!busy&&R.t>R.alertT+1&&R.houses.every(h=>h.safe||h.flooded||h.y>R.maxY))){finishRound();return}
  raf=requestAnimationFrame(loop)}
 
 /* ---------- 끌기 · 누르기 ---------- */
@@ -205,11 +227,11 @@ function bindHelperDrag(card){const k=card.dataset.hcard;
  card.onpointerup=ev=>{card.onpointermove=card.onpointerup=null;ghost?.remove();hot&&document.getElementById('g-'+hot.id)?.classList.remove('hot');if(moved){const h=houseAt(ev.clientX,ev.clientY);if(h)sendHelper(k,h.id);else toast('집 위에 놓아 주세요.')}else toggleSel(k)}}}
 function toggleSel(k){if(paused||R.helpers[k].task)return;sel=sel===k?null:k;renderDock();if(sel){toast(`${k==='me'?'나를':HELPERS[k].name+'을'} 보낼 집을 누르세요.`);document.querySelector(`#g-${R.houses.find(h=>h.warned==null&&!h.flooded)?.id}`)?.focus?.()}}
 function bindMap(){$('map').addEventListener('keydown',e=>{if(paused||(e.key!=='Enter'&&e.key!==' '))return;const hs=e.target.closest('[data-house]');if(!hs)return;e.preventDefault();if(sel){sendHelper(sel,hs.dataset.house);sel=null;renderDock()}else toast('먼저 아래에서 봉사단 카드를 고르세요(Enter).')});$('map').addEventListener('pointerdown',e=>{if(paused)return;const hg=e.target.closest('[data-helper]');if(hg&&!R.helpers[hg.dataset.helper].task){const card=document.querySelector(`[data-hcard="${hg.dataset.helper}"]`);card&&card.onpointerdown&&card.onpointerdown(e);return}
- const hs=e.target.closest('[data-house]');if(hs&&sel){sendHelper(sel,hs.dataset.house);sel=null;renderDock();return}if(hs){const h=R.houses.find(x=>x.id===hs.dataset.house);toast(`${TYPES[h.t].name}${h.lang?' ('+(h.lang==='VN'?'베트남어':'네팔어')+')':''} · ${h.safe?'대피 완료':h.flooded?'구조 대기':h.hesitate?'망설이는 중 · 누군가 직접 가야 해요':h.warned!=null?'준비 중':'경보 못 받음'}`)}})}
+ const hs=e.target.closest('[data-house]');if(hs&&sel){sendHelper(sel,hs.dataset.house);sel=null;renderDock();return}if(hs){const h=R.houses.find(x=>x.id===hs.dataset.house);toast(`${TYPES[h.t].name}${h.lang?' ('+(h.lang==='VN'?'베트남어':'네팔어')+')':''} · ${h.safe?'대피 완료':h.flooded?'구조 대기':h.hesitate?'망설이는 중 · '+(ROUNDS[G.round].helpers?'누군가 직접 가야 해요':'직접 갈 사람이 없어요')+'':h.warned!=null?'준비 중':'경보 못 받음'}`)}})}
 
 /* ---------- 라운드 결과 ---------- */
-function peekMap(){$('overlay').hidden=true;setInert(false);const b=document.createElement('button');b.className='ee-button gs-back';b.textContent='결과로 돌아가기';document.body.appendChild(b);toast('빨간 테두리 집에는 물이 먼저 닿았어요. 누가 사는 집인지 살펴봐요.',4000);b.focus({preventScroll:true});b.onclick=()=>{b.remove();$('overlay').hidden=false;setInert(true);$('seeMap')?.focus({preventScroll:true})}}
-function finishRound(){paused=true;cancelAnimationFrame(raf);for(const h of R.houses){if(!h.safe&&!h.flooded&&h.y<=R.maxY+12)h.flooded=true}
+function peekMap(){$('overlay').hidden=true;setInert(false);const nx=$('nextR').textContent,b=document.createElement('div');b.className='gs-peek';b.innerHTML=`<p>빨간 테두리 집에 물이 먼저 닿았어요. 누가 사는 집인지 살펴봐요.</p><div class="row"><button class="ee-button secondary" id="pkBack">결과 다시 보기</button><button class="ee-button" id="pkNext">${nx}</button></div>`;document.body.appendChild(b);$('pkBack').onclick=()=>{b.remove();$('overlay').hidden=false;setInert(true);$('seeMap')?.focus({preventScroll:true})};$('pkNext').onclick=()=>{b.remove();$('overlay').hidden=false;setInert(true);$('nextR').click()};$('pkNext').focus({preventScroll:true})}
+function finishRound(){paused=true;cancelAnimationFrame(raf);const r1=$('rescue119');if(r1)r1.innerHTML='';for(const h of R.houses){if(!h.safe&&!h.flooded&&h.y<=R.maxY+12)h.flooded=true}
  const list=R.houses.filter(h=>h.t!=='mine'),byType={};for(const h of list)if(!h.safe)document.getElementById('g-'+h.id)?.classList.add('late');for(const h of list){byType[h.t]=byType[h.t]||{s:0,n:0};byType[h.t].n++;if(h.safe)byType[h.t].s++}
  const safe=list.filter(h=>h.safe).length;const kept=R.goodsSaved>0||(G.owned.includes('sand')&&R.houses.some(h=>h.t==='mine'));G.results[G.round]={round:R.n,safe,total:list.length,byType,goods:R.goodsSaved,kept,owned:[...G.owned]};const waitN=list.length-safe;
  const missed=Object.entries(byType).filter(([t,v])=>v.s<v.n).map(([t])=>TYPES[t].name),all=safe===list.length;if(all)sfx('win');
@@ -242,7 +264,7 @@ function ending(){const [r1,r2,r3]=G.results,rate=r=>Math.round(r.safe/r.total*1
 function setInert(on){const w=document.querySelector('.gs-wrap');if(w){w.inert=on;if(on)w.setAttribute('aria-hidden','true');else w.removeAttribute('aria-hidden')}}
 function show(html){$('card').innerHTML=html;$('overlay').hidden=false;setInert(true);$('card').scrollTop=0;const f=$('card').querySelector('button:not([disabled]),input');if(f&&matchMedia('(hover:hover)').matches)f.focus({preventScroll:true})}
 function hide(){$('overlay').hidden=true;setInert(false)}
-function roundIntro(){const r=ROUNDS[G.round];R={...r,t:0,houses:houseList(r),helpers:{},bcLeft:r.bc,alertT:5,events:[],dots:[],evacuated:0};drawMap();drawHouses();Object.keys(HELPERS).forEach((k,i)=>R.helpers[k]={x:BASE.x-50+i*50,y:BASE.y-20,task:null});drawHelpers();renderDock();
+function roundIntro(){const r=ROUNDS[G.round];R={...r,t:0,houses:houseList(r),helpers:{},bcLeft:r.bc+(G.owned.includes('hall')?1:0),alertT:5,events:[],dots:[],evacuated:0};drawMap();drawHouses();Object.keys(HELPERS).forEach((k,i)=>R.helpers[k]={x:BASE.x-50+i*50,y:BASE.y-20,task:null});drawHelpers();renderDock();
  $('roundChip').textContent=`${r.n}라운드 · ${r.title}`;$('rainPill').textContent=`시간당 ${r.rain}mm`;
  const team=['me','saebom','daon'].map(k=>portrait(helperChar(k))).join('');
  show(`<span class="kicker">${r.n}라운드 · 시간당 ${r.rain}mm</span><h2>${r.title}</h2>${robotSay(r.intro,r.n===3?'worried':'explaining')}${r.n===1?`<div class="grid3"><div><span class="facerow">${team}</span>봉사단 카드를 경보 못 받은 집에 <b>끌어다 놓기</b> (카드 누르고 집 누르기도 돼요)</div><div>${art('icons',GIC.buoy)}물이 차기 전에 주민이 <b>떠나야</b> 대피 성공</div><div>${art('icons',GIC.bc)}마을방송은 회관 근처만 · 못 듣는 사람도 있어요</div></div><p class="sub">새봄이는 청각장애인 집에서, 다온이는 베트남어를 쓰는 집에서 훨씬 빨라요. <b>다른 친구가 가도 전달은 되지만 오래 걸려요.</b> 우리 집 짐(가족의 생계)을 지키면 <b>다음 회의 예산 +1</b>. 119 구조대는 읍내(12km)에서 와서 <b>늦게</b> 도착해요.</p>`:r.n===3?`<div class="grid3"><div><span class="facerow gray">${team}</span>봉사단 없음</div><div>${art('icons',GIC.light)}설치한 시스템 ${G.owned.length}개</div><div>${art('icons',GIC.bc)}지켜보며 방송만 할 수 있어요</div></div>`:`<p class="sub">설치한 시스템: ${G.owned.map(id=>UPGRADES.find(u=>u.id===id).name).join(' · ')}</p>`}<div class="row"><button class="ee-button" id="go">탐험 시작 ▶</button></div>`);
@@ -264,7 +286,7 @@ function clearSave(){try{localStorage.removeItem(STORE_KEY)}catch(e){}}
 function confirmClear(back){show(`<h2>이 기기의 기록을 지울까요?</h2>${robotSay('학번·이름과 작성한 생각 정리가 이 기기에서 모두 지워져요. 다음 친구가 이 태블릿을 쓸 때 눌러 주세요. PDF를 저장했는지 먼저 확인하세요.','worried')}<div class="row"><button class="ee-button secondary" id="noC">돌아가기</button><button class="ee-button" id="yesC">지우고 처음으로</button></div>`);$('noC').onclick=back;$('yesC').onclick=()=>{clearSave();G=null;sfx('tap');startScreen()}}
 function resume(){if(G.stage==='case')return caseScreen();if(G.stage==='ending'||G.results.length>=3)return ending();if(G.stage==='meeting')return meeting();G.logs[G.round]=[];roundIntro()}
 function replay(){show(`<h2>다른 선택으로 다시 할까요?</h2>${robotSay('1라운드부터 다시 시작해요. 지금 기록은 지워져요. 남기고 싶다면 먼저 생각 정리에서 PDF로 저장하세요.','worried')}<div class="row"><button class="ee-button secondary" id="noR">돌아가기</button><button class="ee-button" id="yesR">다시 시작</button></div>`);$('noR').onclick=ending;$('yesR').onclick=()=>{G=newGame(G.sid,G.name,G.me);save();roundIntro()}}
-function help(){if(!R||!$('overlay').hidden)return;const wasRunning=!paused&&R.t<R.T;paused=true;show(`<h2>잠깐 멈춤</h2>${robotSay('봉사단 카드를 집 위로 끌어다 놓거나, 카드를 누른 뒤 집을 눌러요. 물이 집에 닿기 전에 주민이 떠나야 해요. 집을 누르면 누가 사는지 보여요. 빨간 점선이 깜빡이는 집은 곧 물이 닿아요.','explaining')}<div class="row"><button class="ee-button" id="resume">계속하기 ▶</button></div>`);$('resume').onclick=()=>{hide();if(wasRunning){paused=false;last=performance.now();raf=requestAnimationFrame(loop)}}}
+function help(){if(!R||!$('overlay').hidden)return;const wasRunning=!paused&&R.t<R.T;paused=true;show(`<h2>잠깐 멈춤</h2>${robotSay(ROUNDS[G.round].helpers?'봉사단 카드를 집 위로 끌어다 놓거나, 카드를 누른 뒤 집을 눌러요. 물이 집에 닿기 전에 주민이 떠나야 해요. 집을 누르면 누가 사는지 보여요. 빨간 점선이 깜빡이는 집은 곧 물이 닿아요.':'봉사단은 졸업해서 이번 라운드에는 아무도 달려갈 수 없어요. 우리가 회의에서 남긴 시스템이 모두에게 닿는지 <b>지켜보는</b> 라운드예요. 할 수 있는 건 <b>마을방송</b>뿐이에요(회관 근처만). 집을 누르면 누가 사는지 보여요.','explaining')}<div class="row"><button class="ee-button" id="resume">계속하기 ▶</button></div>`);$('resume').onclick=()=>{hide();if(wasRunning){paused=false;last=performance.now();raf=requestAnimationFrame(loop)}}}
 
 /* ---------- 생각 정리 · 사례 찾기 ---------- */
 const KEYWORDS=['재난문자 외국인','재난 경보 청각장애인','재난 취약계층 대피','AI 홍수 예보','침수 반지하','디지털 소외 재난'];
